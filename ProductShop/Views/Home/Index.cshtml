@@ -1,0 +1,72 @@
+﻿@model List<ProductViewModel>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="offset-2 col-8">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Назва</th>
+                        <th scope="col">Ціна</th>
+                        <th scope="col">Фотографії</th>
+                        <th scope="col">Інструменти</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <td scope="row">@product.Name</td>
+                            <td>₴ @product.Price</td>
+                            <td>
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        @foreach (var image in product.Images)
+                                        {
+                                            <div class="col-2 ms-2">
+                                                <img src="/images/@image.Path" width="60" height="60" />
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="container d-flex align-items">
+
+                                    <div class="mx-auto my-auto">
+                                        <span class="text-danger deleteitem" data-element="@product.Id"><i class="fas fa-trash-alt fa-lg"></i></span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/axios/axios.min.js"></script>
+    <script>
+        $(function () {
+            $(".deleteitem").on("click", function (e) {
+                //console.log(e.target);
+                var id = $(e.target).closest("span").attr("data-element");
+                axios.post(`/Home/Delete/${id}`)
+                    .then(result => {
+                        return new Promise((resolve, reject) => {
+                            var $divItem = $(e.target).closest("tr");
+                            $divItem.remove();
+
+                            resolve();
+                        });
+                    });
+            });
+        });
+    </script>
+
+}

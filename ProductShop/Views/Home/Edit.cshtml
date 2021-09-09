@@ -1,0 +1,152 @@
+﻿@model ProductEditViewModel
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-2">
+            <h2 class="text-center">Редагувати товар</h2>
+
+            <form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="Edit">
+                <div class="form-group mb-3">
+                    <label asp-for="SelectGroup"></label>
+                    @await Component.InvokeAsync("ShowProduct")
+                </div>
+                <input asp-for="Id" class="d-none" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="Name"></label>
+                    <input class="form-control" asp-for="Name" placeholder="Назва" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Price"></label>
+                    <input class="form-control" asp-for="Price" placeholder="Ціна" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row" id="imageMainBlock">
+                        <div class="col-2">
+                            <img src="/images/btnaddimage.jpg" width="60" height="60" id="btnAddImage" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mt-2">
+                    <input type="submit" class="btn btn-success" value="Змінити" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/axios/axios.min.js"></script>
+    <script src="~/lib/select2/js/i18n/uk.min.js"></script>
+    <script src="~/lib/select2/js/select2.full.min.js"></script>
+    <script>
+        $(function () {
+            $(".selection").select2();
+            var id = 1;
+            var inputId = 1;
+            var $select = $("#SelectGroup");
+            $select.on("change", function () {
+                $divsAdded = $("#imageMainBlock .added");
+                $divsAdded.each(index => {
+                    $divsAdded[index].remove();
+                });
+                $("input#Id").val("0");
+                if ($select.val() != 0) {
+                    axios.post('/Home/GetData/' + $select.val())
+                        .then(result => {
+                            var data = JSON.parse(JSON.stringify(result["data"]));
+                            $("input#Name").val(data["Name"]);
+                            $("input#Price").val(data["Price"]);
+                            $("input#Id").val(data["Id"]);
+                            var images = data["Images"];
+                            
+
+                            var idName = "image" + id;
+                            
+                            for (var i = 0; i < images.length; i++) {
+                                var $deleteIcon = $(`<span class="text-danger align-top">
+                                <i class="fas fa-times"></i></span>`);
+
+                                $deleteIcon.on("click", function (e) {
+                                    let $div = $(e.target).closest("div");
+                                    $div.remove();
+                                    $("#imageMainBlock").prepend(`<input class="d-none added" 
+                                    value="${$div.find('img').attr("src")}" name="deletedImages"/>`);
+                                });
+
+
+                                $blockInput = $(`<div class="col-md-2 added d-flex">
+                                        <img src="/images/${images[i]["Path"]}" width="60" height="60" class="m-2"/>
+                                    </div>`);
+                                $blockInput.append($deleteIcon);
+
+                                id++;
+
+                                $("#imageMainBlock").prepend($blockInput);
+                            }
+                        })
+                        .catch(error => {
+                            alert(error);
+                        });
+                }
+
+            });
+
+            $addbtnimage = $("#btnAddImage");
+            $addbtnimage.on("click", function () {
+                var $blockImages = $("#imageMainBlock");
+                var idName = "imageId" + inputId;
+                var $inputAdd = $(`<input type="file" id="${idName}" class="d-none added" name="Images" multiple/>`);
+                
+                $blockImages.prepend($inputAdd);
+
+                var input = document.getElementById(idName);
+                
+                input.click();
+
+                
+                input.onchange = function (e) {
+                    
+
+                    var files = e.target.files;
+                    for (var i = 0; i < files.length; i++) {
+                        var $deleteIcon = $(`<span class="text-danger align-top">
+                                <i class="fas fa-times"></i></span>`);
+
+                        $deleteIcon.on("click", function (e) {
+                            var fileList = new DataTransfer();
+                            let $div = $(e.target).closest("div");
+                            $div.remove();
+
+
+                            $(document.getElementById(idName).files).each(index => {
+                                
+                                if (document.getElementById(idName).files[index]["name"] != $div.attr("name")) {
+                                    fileList.items.add(document.getElementById(idName).files[index]);
+                                };
+                            });
+
+                            //$(`#${idName}`).files = 
+                            document.getElementById(idName).files = fileList.files;
+                            if (fileList.files.length == 0)
+                            $(`#${idName}`).remove();
+                        });
+
+                        $newDiv = $(`<div class="col-2 added" name="${files[i]["name"]}">
+                            <img src="${URL.createObjectURL(files[i])}" class="m-2" width="60" height="60"/>
+                        </div>`);
+                        $newDiv.append($deleteIcon);
+
+                        $blockImages.prepend($newDiv);
+                    }
+                }
+
+                inputId++;
+            });
+        });
+    </script>
+}

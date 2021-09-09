@@ -1,0 +1,10 @@
+﻿@model List<ProductOptionViewModel>
+<select class="form-select selection" id="SelectGroup">
+    <option value="0" selected>Оберіть продукт</option>
+    @foreach (var product in Model)
+    {
+        <option value="@product.Id">@product.Name</option>
+    }
+</select>
+
+
