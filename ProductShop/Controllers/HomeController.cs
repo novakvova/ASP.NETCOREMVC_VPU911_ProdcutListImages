@@ -115,7 +115,7 @@ namespace ProductShop.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", "Home");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]

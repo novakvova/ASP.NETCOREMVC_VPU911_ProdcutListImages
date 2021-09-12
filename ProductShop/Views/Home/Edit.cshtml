@@ -6,10 +6,10 @@
             <h2 class="text-center">Редагувати товар</h2>
 
             <form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="Edit">
-                <div class="form-group mb-3">
+                @*<div class="form-group mb-3">
                     <label asp-for="SelectGroup"></label>
                     @await Component.InvokeAsync("ShowProduct")
-                </div>
+                </div>*@
                 <input asp-for="Id" class="d-none" />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -48,53 +48,99 @@
             $(".selection").select2();
             var id = 1;
             var inputId = 1;
-            var $select = $("#SelectGroup");
-            $select.on("change", function () {
-                $divsAdded = $("#imageMainBlock .added");
-                $divsAdded.each(index => {
-                    $divsAdded[index].remove();
-                });
-                $("input#Id").val("0");
-                if ($select.val() != 0) {
-                    axios.post('/Home/GetData/' + $select.val())
-                        .then(result => {
-                            var data = JSON.parse(JSON.stringify(result["data"]));
-                            $("input#Name").val(data["Name"]);
-                            $("input#Price").val(data["Price"]);
-                            $("input#Id").val(data["Id"]);
-                            var images = data["Images"];
-                            
+            //  З URL отримуємо id товару якого будемо міняти
+            var idUrl = new URLSearchParams(window.location.search).get("idproduct");
+            console.log("id = ", idUrl);
+
+            //  Із сервера по ідентифікатору отримуємо товар який редагуємо
+            axios.get('/api/Product/get/' + idUrl)
+                .then(result => {
+                    //  Якщо запит був успішний то отримуємо результат
+                    console.log(result);
+                    var data = result.data; //  Результат записуємо в дату
+                    $("input#Name").val(data.name); //  В інпут нейм записуємо назву продукта
+                    $("input#Price").val(data.price); //  В інпут нейм записуємо ціну продукта
+                    $("input#Id").val(data.id); //  В інпут нейм записуємо ід продукта
+                    var images = data.images; //  В інпут нейм записуємо список фоток продукта
+
 
                             var idName = "image" + id;
-                            
-                            for (var i = 0; i < images.length; i++) {
+                    //  Циклом передираєм усі фотографії
+                    for (var i = 0; i < images.length; i++) {
+                                // Ствоерння іконку видалення
                                 var $deleteIcon = $(`<span class="text-danger align-top">
                                 <i class="fas fa-times"></i></span>`);
-
+                        // Оброблення події видалення елемента фотграфії
                                 $deleteIcon.on("click", function (e) {
                                     let $div = $(e.target).closest("div");
                                     $div.remove();
-                                    $("#imageMainBlock").prepend(`<input class="d-none added" 
+                                    // додавання інпута який містить посилання нв фотографію яку видалити
+                                    $("#imageMainBlock").prepend(`<input type="hidden"
                                     value="${$div.find('img').attr("src")}" name="deletedImages"/>`);
                                 });
 
-
-                                $blockInput = $(`<div class="col-md-2 added d-flex">
-                                        <img src="/images/${images[i]["Path"]}" width="60" height="60" class="m-2"/>
+                        // Створюємо блок який відображає фотографію
+                                $blockInput = $(`<div class="col-md-2 d-flex">
+                                        <img src="/images/${images[i].path}" width="60" height="60" class="m-2"/>
                                     </div>`);
                                 $blockInput.append($deleteIcon);
 
                                 id++;
-
+                        // Додає одну фотографію в спеціальний блок з назвою imageMainBlock там де містяться усі фотграфії редаговано елемента
                                 $("#imageMainBlock").prepend($blockInput);
                             }
                         })
                         .catch(error => {
                             alert(error);
                         });
-                }
 
-            });
+            //var $select = $("#SelectGroup");
+            //$select.on("change", function () {
+            //    $divsAdded = $("#imageMainBlock .added");
+            //    $divsAdded.each(index => {
+            //        $divsAdded[index].remove();
+            //    });
+            //    $("input#Id").val("0");
+            //    if ($select.val() != 0) {
+            //        axios.post('/Home/GetData/' + $select.val())
+            //            .then(result => {
+            //                var data = JSON.parse(JSON.stringify(result["data"]));
+            //                $("input#Name").val(data["Name"]);
+            //                $("input#Price").val(data["Price"]);
+            //                $("input#Id").val(data["Id"]);
+            //                var images = data["Images"];
+                            
+
+            //                var idName = "image" + id;
+                            
+            //                for (var i = 0; i < images.length; i++) {
+            //                    var $deleteIcon = $(`<span class="text-danger align-top">
+            //                    <i class="fas fa-times"></i></span>`);
+
+            //                    $deleteIcon.on("click", function (e) {
+            //                        let $div = $(e.target).closest("div");
+            //                        $div.remove();
+            //                        $("#imageMainBlock").prepend(`<input class="d-none added" 
+            //                        value="${$div.find('img').attr("src")}" name="deletedImages"/>`);
+            //                    });
+
+
+            //                    $blockInput = $(`<div class="col-md-2 added d-flex">
+            //                            <img src="/images/${images[i]["Path"]}" width="60" height="60" class="m-2"/>
+            //                        </div>`);
+            //                    $blockInput.append($deleteIcon);
+
+            //                    id++;
+
+            //                    $("#imageMainBlock").prepend($blockInput);
+            //                }
+            //            })
+            //            .catch(error => {
+            //                alert(error);
+            //            });
+            //    }
+
+            //});
 
             $addbtnimage = $("#btnAddImage");
             $addbtnimage.on("click", function () {

@@ -12,10 +12,10 @@ namespace ProductShop.Data.Services
     {
         public static void SeedAll(this IApplicationBuilder app) 
         {
-            using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope()) 
+            using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 EFAppContext context = scope.ServiceProvider.GetRequiredService<EFAppContext>();
-                if (!context.products.Any()) 
+                if (!context.products.Any())
                 {
                     SeedProducts(context);
                 }
@@ -35,7 +35,7 @@ namespace ProductShop.Data.Services
                 Name = "Airpods",
                 Price = 3600
             };
-            context.products.AddRange(new List<Product> { 
+            context.products.AddRange(new List<Product> {
                 product1,
                product2
             });
@@ -43,7 +43,7 @@ namespace ProductShop.Data.Services
 
 
 
-            ProductImage image1 = new ProductImage 
+            ProductImage image1 = new ProductImage
             {
                 Name = "image1.jpg",
                 Product = product1
@@ -55,7 +55,7 @@ namespace ProductShop.Data.Services
                 Product = product2
             };
 
-            context.productImages.AddRange(new List<ProductImage> { 
+            context.productImages.AddRange(new List<ProductImage> {
                 image1,
                 image2
             });

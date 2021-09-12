@@ -39,6 +39,10 @@
                                     <div class="mx-auto my-auto">
                                         <span class="text-danger deleteitem" data-element="@product.Id"><i class="fas fa-trash-alt fa-lg"></i></span>
                                     </div>
+                                    <div class="mx-auto my-auto">
+                                        <a asp-controller="Home" asp-action="Edit" asp-route-idproduct="@product.Id" 
+                                           class="text-danger deleteitem"><i class="fas fa-edit fa-lg"></i></a>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
