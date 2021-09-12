@@ -19,7 +19,7 @@ namespace ProductShop.ViewComponents
         public async Task<IViewComponentResult> InvokeAsync() 
         {
             return await Task.Run(() => {
-                return View("_ShowProduct", _context.products.Select(x => new ProductOptionViewModel { 
+                return View("_ShowProduct", _context.Products.Select(x => new ProductOptionViewModel { 
                     Id = x.Id,
                     Name = x.Name
                 }).ToList());

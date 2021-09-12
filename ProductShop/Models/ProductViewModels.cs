@@ -20,6 +20,9 @@ namespace ProductShop.Models
         public string Path { get; set; }
     }
 
+    /// <summary>
+    /// Модель для зміни товару
+    /// </summary>
     public class ProductEditViewModel
     {
         public int Id { get; set; }
@@ -33,7 +36,20 @@ namespace ProductShop.Models
         public List<IFormFile> Images { get; set; }
         public List<string> deletedImages { get; set; }
     }
-    
+
+    /// <summary>
+    /// Модель для створення товару
+    /// </summary>
+    public class ProductAddViewModel
+    {
+        [Display(Name = "Назва"), Required(ErrorMessage = "Поле 'Назва' не може бути пустим!")]
+        public string Name { get; set; }
+        [Display(Name = "Ціна"), Required(ErrorMessage = "Поле 'Ціна' не може бути пустим!")]
+        public decimal Price { get; set; }
+        [Display(Name = "Фотографії")]
+        public List<IFormFile> Images { get; set; }
+    }
+
     public class ProductOptionViewModel
     {
         public int Id { get; set; }

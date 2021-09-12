@@ -23,7 +23,7 @@ namespace ProductShop.Controllers
         [Route("get/{id}")]
         public IActionResult GetData(int id)
         {
-            var product = _context.products.Include(x => x.Images).FirstOrDefault(x => x.Id == id);
+            var product = _context.Products.Include(x => x.Images).FirstOrDefault(x => x.Id == id);
             ProductViewModel model = new ProductViewModel
             {
                 Id = product.Id,

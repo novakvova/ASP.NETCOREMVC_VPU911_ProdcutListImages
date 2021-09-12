@@ -15,7 +15,7 @@ namespace ProductShop.Data.Services
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 EFAppContext context = scope.ServiceProvider.GetRequiredService<EFAppContext>();
-                if (!context.products.Any())
+                if (!context.Products.Any())
                 {
                     SeedProducts(context);
                 }
@@ -35,7 +35,7 @@ namespace ProductShop.Data.Services
                 Name = "Airpods",
                 Price = 3600
             };
-            context.products.AddRange(new List<Product> {
+            context.Products.AddRange(new List<Product> {
                 product1,
                product2
             });
@@ -55,7 +55,7 @@ namespace ProductShop.Data.Services
                 Product = product2
             };
 
-            context.productImages.AddRange(new List<ProductImage> {
+            context.ProductImages.AddRange(new List<ProductImage> {
                 image1,
                 image2
             });

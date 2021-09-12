@@ -27,7 +27,7 @@ namespace ProductShop.Controllers
         #region Default
         public IActionResult Index()
         {
-            return View(_context.products.Include(x => x.Images).Select(x => new ProductViewModel { 
+            return View(_context.Products.Include(x => x.Images).Select(x => new ProductViewModel { 
                 Name = x.Name,
                 Price = x.Price,
                 Id = x.Id,
@@ -50,6 +50,59 @@ namespace ProductShop.Controllers
         #endregion
 
         [HttpGet]
+        public IActionResult Add()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Add(ProductAddViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Дані введено не коректно!");
+                return View(model);
+
+            }
+
+            var product = new Product();
+            product.Name = model.Name;
+            product.Price = model.Price;
+            product.Images = new List<ProductImage>();
+            _context.Products.Add(product);
+            _context.SaveChanges();
+
+            string dirPath = Path.Combine(Directory.GetCurrentDirectory(), "images");
+
+            if (model.Images != null)
+            {
+                foreach (var newImages in model.Images)
+                {
+                    string ext = Path.GetExtension(newImages.FileName);
+                    string fileName = Path.GetRandomFileName() + ext;
+
+                    string filePath = Path.Combine(dirPath, fileName);
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        newImages.CopyTo(stream);
+                    }
+
+                    _context.ProductImages.Add(new Data.Entities.ProductImage
+                    {
+                        Name = fileName,
+                        ProductId = product.Id
+                    });
+                }
+            }
+
+            _context.SaveChanges();
+
+
+            return RedirectToAction("Index", "Home");
+        }
+
+
+        [HttpGet]
         public IActionResult Edit() 
         {
             return View();
@@ -70,7 +123,7 @@ namespace ProductShop.Controllers
                 return View(model);
             }
 
-            var product = _context.products.Include(x => x.Images).FirstOrDefault(x => x.Id == model.Id);
+            var product = _context.Products.Include(x => x.Images).FirstOrDefault(x => x.Id == model.Id);
             if (product != null) 
             {
                 string dirPath = Path.Combine(Directory.GetCurrentDirectory(), "images");
@@ -85,7 +138,7 @@ namespace ProductShop.Controllers
                     {
                         System.IO.File.Delete(imgPath);
                     }
-                    _context.productImages.Remove(delProductImage);
+                    _context.ProductImages.Remove(delProductImage);
                 }
                 }
                 if (model.Images != null) 
@@ -101,7 +154,7 @@ namespace ProductShop.Controllers
                         newImages.CopyTo(stream);
                     }
 
-                    _context.productImages.Add(new Data.Entities.ProductImage { 
+                    _context.ProductImages.Add(new Data.Entities.ProductImage { 
                         Name = fileName,
                         ProductId = product.Id
                     });
@@ -121,7 +174,7 @@ namespace ProductShop.Controllers
         [HttpPost]
         public IActionResult GetData(int id) 
         {
-            var product = _context.products.Include(x => x.Images).FirstOrDefault(x => x.Id == id);
+            var product = _context.Products.Include(x => x.Images).FirstOrDefault(x => x.Id == id);
             ProductViewModel model = new ProductViewModel { 
             Id = product.Id,
             Name = product.Name,
@@ -137,11 +190,11 @@ namespace ProductShop.Controllers
         [HttpPost]
         public IActionResult Delete(int id) 
         {
-            var product = _context.products.FirstOrDefault(x => x.Id == id);
+            var product = _context.Products.FirstOrDefault(x => x.Id == id);
             if (product != null)
             {
                 List<ProductImage> images = _context
-                    .productImages.Where(x => x.ProductId == product.Id).ToList();
+                    .ProductImages.Where(x => x.ProductId == product.Id).ToList();
 
                 foreach (var image in images)
                 {
@@ -151,11 +204,11 @@ namespace ProductShop.Controllers
                         System.IO.File.Delete(imageName);
                     }
 
-                    _context.productImages.Remove(image);
+                    _context.ProductImages.Remove(image);
                 }
                 _context.SaveChanges();
 
-                _context.products.Remove(product);
+                _context.Products.Remove(product);
                 _context.SaveChanges();
             }
             return Ok();

@@ -1,0 +1,124 @@
+﻿@model ProductAddViewModel
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-2">
+            <h2 class="text-center">Додати товар</h2>
+
+            <form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="Add">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="Name"></label>
+                    <input class="form-control" asp-for="Name" placeholder="Назва" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Price"></label>
+                    <input class="form-control" asp-for="Price" placeholder="Ціна" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row mt-3" id="imageMainBlock">
+                        <div class="col-2">
+                            <img src="/images/btnaddimage.jpg" 
+                                 width="60" 
+                                 height="60" 
+                                 id="btnAddImage"
+                                 style="cursor: pointer"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mt-2">
+                    <input type="submit" class="btn btn-success" value="Додати" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/axios/axios.min.js"></script>
+    <script>
+        $(function () {
+            
+            var inputId = 1;
+
+            //Додати фотку в список фото (нову фотку)
+            $addbtnimage = $("#btnAddImage");
+            $addbtnimage.on("click", function () {
+                //блок, який містить усі фотки
+                var $blockImages = $("#imageMainBlock");
+                //Іd - інтпута для вибору файла фото
+                var idName = "imageId" + inputId;
+                var $inputAdd = $(`
+                        <input type="file"
+                        id="${idName}" 
+                        class="d-none added"
+                        name="Images"
+                        multiple/>`);
+
+                //додаємо інпут в дом дерево - там де знаходяться усі елементи фото
+                $blockImages.prepend($inputAdd);
+                //ми додали наш інпут для файлу в дом, тепер мона його отримати
+                var input = document.getElementById(idName);
+                //Клікаємо по інтпуту
+                input.click();
+
+                //якщо ми обрали, якись файл
+                input.onchange = function (e) {
+                    
+                    ///ми отримуємо список файлі, що обрали
+                    ///event.target
+                    var files = e.target.files;
+                    for (var i = 0; i < files.length; i++) {
+                        //добавляємо іконку х - для видалення
+                        var $deleteIcon = $(`
+                                <span class="text-danger align-top" style="cursor: pointer">
+                                    <i class="fas fa-times"></i>
+                                </span>`);
+
+                        //створюємо дів, для збереження фото
+                        $newDiv = $(`<div class="col-2 added" name="${files[i]["name"]}">
+                            <img src="${URL.createObjectURL(files[i])}" class="m-2" width="60" height="60"/>
+                        </div>`);
+                        //в дів добавляємо хрестик
+                        $newDiv.append($deleteIcon);
+
+                        //в самий головний дів додаємо хрестик і фотку
+                        $blockImages.prepend($newDiv);
+
+                        //Обробник видалити фотку із списку
+                        $deleteIcon.on("click", function (e) {
+                            //Для того, щоб із інтпута типу file можна було видаляти файлики
+                            var fileList = new DataTransfer();
+                            //Находимо головний дів для блоку
+                            let $div = $(e.target).closest("div");
+                            $div.remove();
+                            //видаляємо з інтпута типу файл, файл до якого віносилася фотографія
+                            let fileInputImages = document.getElementById(idName);
+                            $(fileInputImages.files).each(index => {
+                                
+                                if (fileInputImages.files[index]["name"] != $div.attr("name")) {
+                                    fileList.items.add(fileInputImages.files[index]);
+                                };
+                            });
+                            //перезаписуємо у відповідному інпуті фотки, щоб вони не відпавилися на север.
+                            fileInputImages.files = fileList.files;
+                            //Якщо в інпуті файл відсутні фотки, то ми його грохаємо
+                            if (fileList.files.length == 0)
+                                $(`#${idName}`).remove();
+                        });
+
+                        
+                    }
+                }
+
+                //змінюємо іd для ідентифікатора інпута
+                inputId++;
+            });
+        });
+    </script>
+}

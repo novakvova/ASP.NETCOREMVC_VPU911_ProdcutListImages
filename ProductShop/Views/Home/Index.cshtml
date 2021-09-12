@@ -4,8 +4,13 @@
 }
 
 <div class="container">
+   
     <div class="row">
+
         <div class="offset-2 col-8">
+            <h1 class="text-center">Список товарів</h1>
+            <a asp-action="Add" class="btn btn-success mb-3">Додати</a>
+
             <table class="table table-bordered table-striped">
                 <thead class="table-dark">
                     <tr>
@@ -27,7 +32,7 @@
                                         @foreach (var image in product.Images)
                                         {
                                             <div class="col-2 ms-2">
-                                                <img src="/images/@image.Path" width="60" height="60" />
+                                                <img src="/images/@image.Path" width="100%" />
                                             </div>
                                         }
                                     </div>
@@ -40,7 +45,7 @@
                                         <span class="text-danger deleteitem" data-element="@product.Id"><i class="fas fa-trash-alt fa-lg"></i></span>
                                     </div>
                                     <div class="mx-auto my-auto">
-                                        <a asp-controller="Home" asp-action="Edit" asp-route-idproduct="@product.Id" 
+                                        <a asp-controller="Home" asp-action="Edit" asp-route-idproduct="@product.Id"
                                            class="text-danger deleteitem"><i class="fas fa-edit fa-lg"></i></a>
                                     </div>
                                 </div>
