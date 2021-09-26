@@ -1,32 +1,45 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ProductShop.ActionFilters;
 using ProductShop.Data;
 using ProductShop.Data.Entities;
 using ProductShop.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ProductShop.Controllers
 {
+    [Internationalization]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IStringLocalizer<HomeController> _localizer;
         public EFAppContext _context { get; set; }
 
-        public HomeController(ILogger<HomeController> logger, EFAppContext context)
+        public HomeController(ILogger<HomeController> logger,
+            IStringLocalizer<HomeController> localizer,
+            EFAppContext context)
         {
             _logger = logger;
             _context = context;
+            _localizer = localizer;
         }
         #region Default
         public IActionResult Index()
         {
+            ViewBag.Email = _localizer["Email"];
             return View(_context.Products.Include(x => x.Images).Select(x => new ProductViewModel { 
                 Name = x.Name,
                 Price = x.Price,
@@ -36,6 +49,21 @@ namespace ProductShop.Controllers
                 }).ToList()
             }).ToList());
         }
+
+        //[HttpGet]
+        //public IActionResult SetLanguage(string culture, string returnUrl)
+        //{
+        //    Response.Cookies.Append(
+        //        CookieRequestCultureProvider.DefaultCookieName,
+        //        CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+        //        new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+        //    );
+        //    //HttpContext.Session.SetString("SetLanguage", culture);
+
+        //    if (!string.IsNullOrEmpty(returnUrl))
+        //        return LocalRedirect(returnUrl);
+        //    return RedirectToAction("Index");
+        //}
 
         public IActionResult Privacy()
         {

@@ -1,20 +1,24 @@
 ﻿@model List<ProductViewModel>
+@using Microsoft.Extensions.Localization
+@using ProductShop.Controllers 
+@inject IStringLocalizer<HomeController> Localizer
+
 @{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="container">
-   
+
     <div class="row">
 
         <div class="offset-2 col-8">
-            <h1 class="text-center">Список товарів</h1>
+            <h1 class="text-center">Список товарів @Localizer["Email"];</h1>
             <a asp-action="Add" class="btn btn-success mb-3">Додати</a>
 
             <table class="table table-bordered table-striped">
                 <thead class="table-dark">
                     <tr>
-                        <th scope="col">Назва</th>
+                        <th scope="col">Назва @ViewBag.Email</th>
                         <th scope="col">Ціна</th>
                         <th scope="col">Фотографії</th>
                         <th scope="col">Інструменти</th>
